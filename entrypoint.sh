@@ -21,27 +21,32 @@ END
 
 echo $CLASPRC > ~/.clasprc.json
 
-CLASP=$(cat <<-END
+COMMAND="$8"
+TITLE="${11}"
+
+if [ "$COMMAND" = "push" ] || [ "$COMMAND" = "deploy" ]; then
+  CLASP=$(cat <<-END
     {
         "scriptId": "$6"
     }
 END
-)
+  )
 
-if [ -n "$7" ]; then
-  if [ -e "$7" ]; then
-    cd "$7"
-  else
-    echo "rootDir is invalid."
-    exit 1
+  if [ -n "$7" ]; then
+    if [ -e "$7" ]; then
+      cd "$7"
+    else
+      echo "rootDir is invalid."
+      exit 1
+    fi
   fi
+
+  echo $CLASP > .clasp.json
 fi
 
-echo $CLASP > .clasp.json
-
-if [ "$8" = "push" ]; then
+if [ "$COMMAND" = "push" ]; then
   clasp push -f
-elif [ "$8" = "deploy" ]; then
+elif [ "$COMMAND" = "deploy" ]; then
   if [ -n "$9" ]; then
     clasp push -f
 
@@ -58,6 +63,17 @@ elif [ "$8" = "deploy" ]; then
     else
       clasp deploy
     fi
+  fi
+elif [ "$COMMAND" = "create" ]; then
+  if [ -z "$TITLE" ]; then
+    echo "title is required for create command."
+    exit 1
+  fi
+
+  if [ -n "$7" ]; then
+    clasp create-script --type sheets --title "$TITLE" --rootDir "$7"
+  else
+    clasp create-script --type sheets --title "$TITLE"
   fi
 else
   echo "command is invalid."

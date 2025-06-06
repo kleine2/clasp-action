@@ -26,13 +26,16 @@ inputs:
     description: 'Directory where scripts are stored'
     required: false
   command:
-    description: 'Command to execute(push or deploy)'
+    description: 'Command to execute(push, deploy or create)'
     required: true
   description:
     description: 'Description of the deployment'
     required: false
   deployId:
     description: 'Deploy ID that will be updated'
+    required: false
+  title:
+    description: 'Title of the script (required for create command)'
     required: false
 runs:
   using: 'docker'
@@ -48,3 +51,4 @@ runs:
     - ${{ inputs.command }}
     - ${{ inputs.description }}
     - ${{ inputs.deployId }}
+    - ${{ inputs.title }}

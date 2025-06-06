@@ -1,6 +1,6 @@
 # Clasp Action
 
-This action uses [clasp](https://github.com/google/clasp) to push or deploy to [Google Apps Script](https://developers.google.com/apps-script/). This action is running `clasp push -f` regardless of whether you select `push` or `deploy` as the command. This will force the remote manifest to be overwritten.
+This action uses [clasp](https://github.com/google/clasp) to push, deploy or create projects on [Google Apps Script](https://developers.google.com/apps-script/). This action is running `clasp push -f` regardless of whether you select `push` or `deploy` as the command. This will force the remote manifest to be overwritten.
 
 ## Inputs
 
@@ -34,7 +34,7 @@ Directory where scripts are stored.
 
 ### `command`
 
-**Required** Command to execute(`push` or `deploy`).
+**Required** Command to execute(`push`, `deploy` or `create`).
 
 If `deploy` is selected, this action is running `clasp push -f` just before.
 
@@ -48,6 +48,10 @@ Description of the deployment.
 ### `deployId`
 
 Deploy ID that will be updated with this push.
+
+### `title`
+
+Title of the script. Required when `command` is `create`.
 
 ## Example usage
 
@@ -122,6 +126,21 @@ Deploy ID that will be updated with this push.
     scriptId: ${{ secrets.SCRIPT_ID }}
     command: 'deploy'
     deployId: ${{ secrets.DEPLOY_ID }}
+```
+
+### Case to create a new script
+
+```yaml
+- uses: daikikatsuragawa/clasp-action@v1.1.0
+  with:
+    accessToken: ${{ secrets.ACCESS_TOKEN }}
+    idToken: ${{ secrets.ID_TOKEN }}
+    refreshToken: ${{ secrets.REFRESH_TOKEN }}
+    clientId: ${{ secrets.CLIENT_ID }}
+    clientSecret: ${{ secrets.CLIENT_SECRET }}
+    command: 'create'
+    title: 'My Spreadsheet Script'
+    rootDir: 'src'
 ```
 
 ## License summary
