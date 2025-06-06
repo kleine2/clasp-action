@@ -37,6 +37,11 @@ inputs:
   title:
     description: 'Title of the script (required for create command)'
     required: false
+outputs:
+  script_url:
+    description: 'URL of the created script when using the create command'
+  spreadsheet_url:
+    description: 'URL of the newly created spreadsheet document when using the create command'
 runs:
   using: 'docker'
   image: 'Dockerfile'

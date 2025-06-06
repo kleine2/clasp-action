@@ -53,6 +53,16 @@ Deploy ID that will be updated with this push.
 
 Title of the script. Required when `command` is `create`.
 
+## Outputs
+
+### `script_url`
+
+URL of the created script when `command` is `create`.
+
+### `spreadsheet_url`
+
+URL of the newly created spreadsheet document when `command` is `create`.
+
 ## Example usage
 
 ### Case to push

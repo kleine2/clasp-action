@@ -71,9 +71,18 @@ elif [ "$COMMAND" = "create" ]; then
   fi
 
   if [ -n "$7" ]; then
-    clasp create-script --type sheets --title "$TITLE" --rootDir "$7"
+    CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" --rootDir "$7" 2>&1)
   else
-    clasp create-script --type sheets --title "$TITLE"
+    CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" 2>&1)
+  fi
+  echo "$CREATE_OUT"
+  SPREADSHEET_URL=$(echo "$CREATE_OUT" | grep -o 'https://drive.google.com[^ ]*')
+  SCRIPT_URL=$(echo "$CREATE_OUT" | grep -o 'https://script.google.com[^ ]*')
+  if [ -n "$SPREADSHEET_URL" ]; then
+    echo "spreadsheet_url=$SPREADSHEET_URL" >> "$GITHUB_OUTPUT"
+  fi
+  if [ -n "$SCRIPT_URL" ]; then
+    echo "script_url=$SCRIPT_URL" >> "$GITHUB_OUTPUT"
   fi
 else
   echo "command is invalid."
