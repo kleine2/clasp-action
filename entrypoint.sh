@@ -84,6 +84,28 @@ elif [ "$COMMAND" = "create" ]; then
   if [ -n "$SCRIPT_URL" ]; then
     echo "script_url=$SCRIPT_URL" >> "$GITHUB_OUTPUT"
   fi
+elif [ "$COMMAND" = "create_and_push" ]; then
+  if [ -z "$TITLE" ]; then
+    echo "title is required for create_and_push command."
+    exit 1
+  fi
+
+  if [ -n "$7" ]; then
+    CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" --rootDir "$7" 2>&1)
+    cd "$7"
+  else
+    CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" 2>&1)
+  fi
+  echo "$CREATE_OUT"
+  SPREADSHEET_URL=$(echo "$CREATE_OUT" | grep -o 'https://drive.google.com[^ ]*')
+  SCRIPT_URL=$(echo "$CREATE_OUT" | grep -o 'https://script.google.com[^ ]*')
+  if [ -n "$SPREADSHEET_URL" ]; then
+    echo "spreadsheet_url=$SPREADSHEET_URL" >> "$GITHUB_OUTPUT"
+  fi
+  if [ -n "$SCRIPT_URL" ]; then
+    echo "script_url=$SCRIPT_URL" >> "$GITHUB_OUTPUT"
+  fi
+  clasp push -f
 else
   echo "command is invalid."
   exit 1
