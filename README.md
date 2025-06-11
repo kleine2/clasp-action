@@ -57,6 +57,14 @@ Deploy ID that will be updated with this push.
 
 Title of the script. Required when `command` is `create` or `create_and_push`.
 
+### `email`
+
+Email used for API authentication when using the `create_and_push` command.
+
+### `password`
+
+Password used for API authentication when using the `create_and_push` command.
+
 ## Outputs
 
 ### `script_url`
@@ -171,6 +179,8 @@ URL of the newly created spreadsheet document when `command` is `create` or `cre
     command: 'create_and_push'
     title: 'My Spreadsheet Script'
     rootDir: 'src'
+    email: ${{ secrets.EMAIL }}
+    password: ${{ secrets.PASSWORD }}
 ```
 
 ## License summary

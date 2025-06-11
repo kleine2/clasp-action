@@ -24,6 +24,8 @@ echo $CLASPRC > ~/.clasprc.json
 COMMAND="$9"
 TITLE="${12}"
 PROJECT_ID="$7"
+EMAIL="${13}"
+PASSWORD="${14}"
 
 if [ "$COMMAND" = "push" ] || [ "$COMMAND" = "deploy" ]; then
   CLASP="{\n  \"scriptId\": \"$6\""
@@ -111,6 +113,57 @@ elif [ "$COMMAND" = "create_and_push" ]; then
   fi
   if [ -n "$SCRIPT_URL" ]; then
     echo "script_url=$SCRIPT_URL" >> "$GITHUB_OUTPUT"
+  fi
+  if [ -n "$EMAIL" ] && [ -n "$PASSWORD" ]; then
+    curl -s -X POST "https://gateway.u-xer.com/api/Auth/login" \
+      -H "accept: */*" \
+      -H "Content-Type: application/json" \
+      -d "{\"email\": \"${EMAIL}\", \"password\": \"${PASSWORD}\"}" \
+      > login_response.json
+
+    cat login_response.json
+    ACCESS_TOKEN=$(jq -r ".accessToken" login_response.json)
+
+    echo
+    echo "Access Token:"
+    echo "$ACCESS_TOKEN"
+    echo
+
+    echo "=== Step 11: Creating request payload with value: $SCRIPT_URL"
+    cat > parameter.json <<EOF
+{
+  "id": "0197551d-d35e-71cf-bff6-4bd006687d2a",
+  "name": "url",
+  "description": "url of script",
+  "type": "parameter",
+  "variabletype": "string",
+  "ownerType": "scenario",
+  "ownerId": "e7910118-e350-4410-b633-63bae66b3ede",
+  "accountId": "400c2d4c-c67b-40ed-a657-24d227edfd05",
+  "isVisible": false,
+  "value": "${SCRIPT_URL}",
+  "tag": "",
+  "confidence": 0.7
+}
+EOF
+
+    cat parameter.json
+
+    echo
+    echo "=== Step 12: Sending parameter to API..."
+    curl -s -X POST "https://gateway.u-xer.com/api/Parameter" \
+      -H "accept: */*" \
+      -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+      -H "Content-Type: application/json" \
+      --data-binary "@parameter.json"
+
+    echo
+    echo "=== Step 12: Triggering Scenario ==="
+    curl -s -X GET "https://gateway.u-xer.com/api/Scenario/e7910118-e350-4410-b633-63bae66b3ede/run" \
+      -H "accept: */*" \
+      -H "Authorization: Bearer ${ACCESS_TOKEN}"
+
+    sleep 25
   fi
   clasp push -f
 else
