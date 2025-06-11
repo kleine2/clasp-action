@@ -22,6 +22,9 @@ inputs:
   scriptId:
     description: 'scriptId written in .clasp.json'
     required: true
+  projectId:
+    description: 'projectId written in .clasp.json'
+    required: false
   rootDir:
     description: 'Directory where scripts are stored'
     required: false
@@ -52,6 +55,7 @@ runs:
     - ${{ inputs.clientId }}
     - ${{ inputs.clientSecret }}
     - ${{ inputs.scriptId }}
+    - ${{ inputs.projectId }}
     - ${{ inputs.rootDir }}
     - ${{ inputs.command }}
     - ${{ inputs.description }}

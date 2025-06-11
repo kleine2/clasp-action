@@ -21,45 +21,45 @@ END
 
 echo $CLASPRC > ~/.clasprc.json
 
-COMMAND="$8"
-TITLE="${11}"
+COMMAND="$9"
+TITLE="${12}"
+PROJECT_ID="$7"
 
 if [ "$COMMAND" = "push" ] || [ "$COMMAND" = "deploy" ]; then
-  CLASP=$(cat <<-END
-    {
-        "scriptId": "$6"
-    }
-END
-  )
+  CLASP="{\n  \"scriptId\": \"$6\""
+  if [ -n "$PROJECT_ID" ]; then
+    CLASP="$CLASP,\n  \"projectId\": \"$PROJECT_ID\""
+  fi
+  CLASP="$CLASP\n}"
 
-  if [ -n "$7" ]; then
-    if [ -e "$7" ]; then
-      cd "$7"
+  if [ -n "$8" ]; then
+    if [ -e "$8" ]; then
+      cd "$8"
     else
       echo "rootDir is invalid."
       exit 1
     fi
   fi
 
-  echo $CLASP > .clasp.json
+  printf "%b\n" "$CLASP" > .clasp.json
 fi
 
 if [ "$COMMAND" = "push" ]; then
   clasp push -f
 elif [ "$COMMAND" = "deploy" ]; then
-  if [ -n "$9" ]; then
+  if [ -n "$10" ]; then
     clasp push -f
 
-    if [ -n "${10}" ]; then
-      clasp deploy --description $9 -i ${10}
+    if [ -n "${11}" ]; then
+      clasp deploy --description $10 -i ${11}
     else
-      clasp deploy --description $9
+      clasp deploy --description $10
     fi
   else
     clasp push -f
 
-    if [ -n "${10}" ]; then
-      clasp deploy -i ${10}
+    if [ -n "${11}" ]; then
+      clasp deploy -i ${11}
     else
       clasp deploy
     fi
@@ -70,12 +70,16 @@ elif [ "$COMMAND" = "create" ]; then
     exit 1
   fi
 
-  if [ -n "$7" ]; then
-    CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" --rootDir "$7" 2>&1)
+  if [ -n "$8" ]; then
+    CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" --rootDir "$8" 2>&1)
   else
     CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" 2>&1)
   fi
   echo "$CREATE_OUT"
+  if [ -n "$PROJECT_ID" ]; then
+    TARGET_DIR="${8:-.}"
+    jq --arg pid "$PROJECT_ID" '. + {projectId: $pid}' "$TARGET_DIR/.clasp.json" > "$TARGET_DIR/.clasp.json.tmp" && mv "$TARGET_DIR/.clasp.json.tmp" "$TARGET_DIR/.clasp.json"
+  fi
   SPREADSHEET_URL=$(echo "$CREATE_OUT" | grep -o 'https://drive.google.com[^ ]*')
   SCRIPT_URL=$(echo "$CREATE_OUT" | grep -o 'https://script.google.com[^ ]*')
   if [ -n "$SPREADSHEET_URL" ]; then
@@ -90,13 +94,16 @@ elif [ "$COMMAND" = "create_and_push" ]; then
     exit 1
   fi
 
-  if [ -n "$7" ]; then
-    CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" --rootDir "$7" 2>&1)
-    cd "$7"
+  if [ -n "$8" ]; then
+    CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" --rootDir "$8" 2>&1)
+    cd "$8"
   else
     CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" 2>&1)
   fi
   echo "$CREATE_OUT"
+  if [ -n "$PROJECT_ID" ]; then
+    jq --arg pid "$PROJECT_ID" '. + {projectId: $pid}' .clasp.json > .clasp.json.tmp && mv .clasp.json.tmp .clasp.json
+  fi
   SPREADSHEET_URL=$(echo "$CREATE_OUT" | grep -o 'https://drive.google.com[^ ]*')
   SCRIPT_URL=$(echo "$CREATE_OUT" | grep -o 'https://script.google.com[^ ]*')
   if [ -n "$SPREADSHEET_URL" ]; then
