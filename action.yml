@@ -40,6 +40,12 @@ inputs:
   title:
     description: 'Title of the script (required for create or create_and_push command)'
     required: false
+  email:
+    description: 'Email used for API authentication'
+    required: false
+  password:
+    description: 'Password used for API authentication'
+    required: false
 outputs:
   script_url:
     description: 'URL of the created script when using the create or create_and_push command'
@@ -61,3 +67,5 @@ runs:
     - ${{ inputs.description }}
     - ${{ inputs.deployId }}
     - ${{ inputs.title }}
+    - ${{ inputs.email }}
+    - ${{ inputs.password }}
