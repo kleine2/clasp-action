@@ -28,6 +28,10 @@ This action uses [clasp](https://github.com/google/clasp) to push, deploy, creat
 
 **Required** `scriptId` written in `.clasp.json`.
 
+### `projectId`
+
+`projectId` written in `.clasp.json`.
+
 ### `rootDir`
 
 Directory where scripts are stored.
@@ -76,6 +80,7 @@ URL of the newly created spreadsheet document when `command` is `create` or `cre
     clientId: ${{ secrets.CLIENT_ID }}
     clientSecret: ${{ secrets.CLIENT_SECRET }}
     scriptId: ${{ secrets.SCRIPT_ID }}
+    projectId: ${{ secrets.PROJECT_ID }}
     command: 'push'
 ```
 
