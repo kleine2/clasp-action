@@ -201,8 +201,24 @@ elif [ "$COMMAND" = "delete" ]; then
     exit 1
   fi
 
+  # Refresh access token using the provided OAuth credentials
+  REFRESH_RESPONSE=$(curl -s -X POST \
+    -d client_id="$4" \
+    -d client_secret="$5" \
+    -d refresh_token="$3" \
+    -d grant_type=refresh_token \
+    https://oauth2.googleapis.com/token)
+  REFRESHED_ACCESS_TOKEN=$(echo "$REFRESH_RESPONSE" | jq -r '.access_token')
+
+  if [ -z "$REFRESHED_ACCESS_TOKEN" ] || [ "$REFRESHED_ACCESS_TOKEN" = "null" ]; then
+    echo "Failed to refresh access token"
+    echo "$REFRESH_RESPONSE"
+    exit 1
+  fi
+  echo "Access token refreshed"
+
   echo "Deleting spreadsheet $SPREADSHEET_ID"
-  curl -s -X DELETE -H "Authorization: Bearer $1" "https://www.googleapis.com/drive/v3/files/${SPREADSHEET_ID}"
+  curl -s -X DELETE -H "Authorization: Bearer $REFRESHED_ACCESS_TOKEN" "https://www.googleapis.com/drive/v3/files/${SPREADSHEET_ID}"
 else
   echo "command is invalid."
   exit 1
