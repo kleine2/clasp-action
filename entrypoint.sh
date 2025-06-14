@@ -180,6 +180,7 @@ elif [ "$COMMAND" = "delete" ]; then
   fi
 
   COMMENTS=$(curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${REPO_NAME}/issues/${PR_NUMBER}/comments?per_page=100")
+  echo "$COMMENTS"
   SPREADSHEET_URL=$(echo "$COMMENTS" | grep -o 'https://[^" ]*spreadsheets/d/[^" ]*' | head -n 1)
   if [ -z "$SPREADSHEET_URL" ]; then
     SPREADSHEET_URL=$(echo "$COMMENTS" | grep -o 'https://drive.google.com[^" ]*' | head -n 1)
