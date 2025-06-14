@@ -21,6 +21,12 @@ END
 
 echo $CLASPRC > ~/.clasprc.json
 
+# Git may refuse to operate on repos owned by different users. Mark the
+# GitHub workspace as safe to avoid "dubious ownership" errors when the action
+# performs git commands.
+GIT_WORKSPACE="${GITHUB_WORKSPACE:-/github/workspace}"
+git config --global --add safe.directory "$GIT_WORKSPACE"
+
 COMMAND="$9"
 TITLE="${12}"
 PROJECT_ID="$7"
