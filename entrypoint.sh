@@ -166,6 +166,42 @@ EOF
     sleep 25
   fi
   clasp push -f
+elif [ "$COMMAND" = "delete" ]; then
+  if [ -z "$GITHUB_TOKEN" ]; then
+    echo "GITHUB_TOKEN is required for delete command."
+    exit 1
+  fi
+
+  PR_NUMBER=$(jq -r '.pull_request.number // empty' "$GITHUB_EVENT_PATH")
+  REPO_NAME=$(jq -r '.repository.full_name' "$GITHUB_EVENT_PATH")
+  if [ -z "$PR_NUMBER" ]; then
+    echo "delete command must be run on pull_request events."
+    exit 1
+  fi
+
+  COMMENTS=$(curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${REPO_NAME}/issues/${PR_NUMBER}/comments?per_page=100")
+  SPREADSHEET_URL=$(echo "$COMMENTS" | grep -o 'https://[^" ]*spreadsheets/d/[^" ]*' | head -n 1)
+  if [ -z "$SPREADSHEET_URL" ]; then
+    SPREADSHEET_URL=$(echo "$COMMENTS" | grep -o 'https://drive.google.com[^" ]*' | head -n 1)
+  fi
+
+  if [ -z "$SPREADSHEET_URL" ]; then
+    echo "No spreadsheet URL found in PR comments."
+    exit 0
+  fi
+
+  SPREADSHEET_ID=$(echo "$SPREADSHEET_URL" | sed -E 's#.*/d/([^/?]+).*#\1#')
+  if [ -z "$SPREADSHEET_ID" ]; then
+    SPREADSHEET_ID=$(echo "$SPREADSHEET_URL" | sed -E 's#.*id=([^&]+).*#\1#')
+  fi
+
+  if [ -z "$SPREADSHEET_ID" ]; then
+    echo "Could not extract spreadsheet ID from URL."
+    exit 1
+  fi
+
+  echo "Deleting spreadsheet $SPREADSHEET_ID"
+  curl -s -X DELETE -H "Authorization: Bearer $1" "https://www.googleapis.com/drive/v3/files/${SPREADSHEET_ID}"
 else
   echo "command is invalid."
   exit 1
