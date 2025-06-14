@@ -165,7 +165,36 @@ EOF
 
     sleep 25
   fi
+  if [ -f combine_gs_files.py ]; then
+    python3 combine_gs_files.py
+    if [ -f appsscript_test.json ]; then
+      cp appsscript_test.json ./appsscript_test.json
+    fi
+  fi
   clasp push -f
+  VERSION_RAW=$(clasp version "Automated version" | awk '{print $3}')
+  VERSION_NUMBER="${VERSION_RAW%%.*}"
+  echo "Version created: $VERSION_NUMBER"
+  clasp deploy --versionNumber "$VERSION_NUMBER" --description "Automated deployment"
+
+  SPREADSHEET_ID=$(echo "$SPREADSHEET_URL" | sed -nE 's#.*/d/([^/?]+).*#\1#p')
+  if [ -z "$SPREADSHEET_ID" ]; then
+    SPREADSHEET_ID=$(echo "$SPREADSHEET_URL" | sed -nE 's#.*id=([^&]+).*#\1#p')
+  fi
+
+  BASE_SHA=$(jq -r '.pull_request.base.sha // empty' "$GITHUB_EVENT_PATH")
+  if [ -n "$BASE_SHA" ]; then
+    git fetch --depth=1 origin "$BASE_SHA"
+    TEST_FILE=$(git diff --name-status "$BASE_SHA" "$GITHUB_SHA" | awk '/^A\s+Tests\//{print $2}' | head -n 1)
+  else
+    TEST_FILE=$(git diff --name-status HEAD~1 "$GITHUB_SHA" | awk '/^A\s+Tests\//{print $2}' | head -n 1)
+  fi
+
+  if [ -n "$TEST_FILE" ]; then
+    TEST_FUNC=$(basename "$TEST_FILE" .gs)
+    clasp run-function setupTestContext --params "[\"${SPREADSHEET_ID}\",\"Sheet1\"]"
+    clasp run-function "$TEST_FUNC"
+  fi
 elif [ "$COMMAND" = "delete" ]; then
   if [ -z "$GITHUB_TOKEN" ]; then
     echo "GITHUB_TOKEN is required for delete command."
