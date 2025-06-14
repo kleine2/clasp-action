@@ -1,6 +1,6 @@
 # Clasp Action
 
-This action uses [clasp](https://github.com/google/clasp) to push, deploy, create or create and push projects on [Google Apps Script](https://developers.google.com/apps-script/). This action is running `clasp push -f` regardless of whether you select `push` or `deploy` as the command. This will force the remote manifest to be overwritten.
+This action uses [clasp](https://github.com/google/clasp) to push, deploy, create, delete or create and push projects on [Google Apps Script](https://developers.google.com/apps-script/). This action is running `clasp push -f` regardless of whether you select `push` or `deploy` as the command. This will force the remote manifest to be overwritten.
 
 ## Inputs
 
@@ -38,7 +38,7 @@ Directory where scripts are stored.
 
 ### `command`
 
-**Required** Command to execute(`push`, `deploy`, `create` or `create_and_push`).
+**Required** Command to execute(`push`, `deploy`, `create`, `create_and_push` or `delete`).
 
 If `deploy` is selected, this action is running `clasp push -f` just before.
 
@@ -181,6 +181,19 @@ URL of the newly created spreadsheet document when `command` is `create` or `cre
     rootDir: 'src'
     email: ${{ secrets.EMAIL }}
     password: ${{ secrets.PASSWORD }}
+```
+
+### Case to delete a spreadsheet on pull request close
+
+```yaml
+- uses: daikikatsuragawa/clasp-action@v1.1.0
+  with:
+    accessToken: ${{ secrets.ACCESS_TOKEN }}
+    idToken: ${{ secrets.ID_TOKEN }}
+    refreshToken: ${{ secrets.REFRESH_TOKEN }}
+    clientId: ${{ secrets.CLIENT_ID }}
+    clientSecret: ${{ secrets.CLIENT_SECRET }}
+    command: 'delete'
 ```
 
 ## License summary

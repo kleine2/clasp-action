@@ -29,7 +29,7 @@ inputs:
     description: 'Directory where scripts are stored'
     required: false
   command:
-    description: 'Command to execute(push, deploy, create or create_and_push)'
+    description: 'Command to execute(push, deploy, create, create_and_push or delete)'
     required: true
   description:
     description: 'Description of the deployment'
