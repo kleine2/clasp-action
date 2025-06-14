@@ -191,9 +191,9 @@ elif [ "$COMMAND" = "delete" ]; then
     exit 0
   fi
 
-  SPREADSHEET_ID=$(echo "$SPREADSHEET_URL" | sed -E 's#.*/d/([^/?]+).*#\1#')
+  SPREADSHEET_ID=$(echo "$SPREADSHEET_URL" | sed -nE 's#.*/d/([^/?]+).*#\1#p')
   if [ -z "$SPREADSHEET_ID" ]; then
-    SPREADSHEET_ID=$(echo "$SPREADSHEET_URL" | sed -E 's#.*id=([^&]+).*#\1#')
+    SPREADSHEET_ID=$(echo "$SPREADSHEET_URL" | sed -nE 's#.*id=([^&]+).*#\1#p')
   fi
 
   if [ -z "$SPREADSHEET_ID" ]; then
