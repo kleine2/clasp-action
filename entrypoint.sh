@@ -165,12 +165,6 @@ EOF
 
     sleep 25
   fi
-  if [ -f combine_gs_files.py ]; then
-    python3 combine_gs_files.py
-    if [ -f appsscript_test.json ]; then
-      cp appsscript_test.json ./appsscript_test.json
-    fi
-  fi
   clasp push -f
   VERSION_RAW=$(clasp version "Automated version" | awk '{print $3}')
   VERSION_NUMBER="${VERSION_RAW%%.*}"
