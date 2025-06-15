@@ -214,13 +214,6 @@ EOF
     TEST_OUTPUT=$(clasp run-function "$TEST_FUNC" 2>&1)
     echo "$TEST_OUTPUT"
     printf 'test_output<<EOF\n%s\nEOF\n' "$TEST_OUTPUT" >> "$GITHUB_OUTPUT"
-    PR_NUMBER=$(jq -r '.pull_request.number // empty' "$GITHUB_EVENT_PATH")
-    REPO_NAME=$(jq -r '.repository.full_name' "$GITHUB_EVENT_PATH")
-    if [ -n "$PR_NUMBER" ] && [ -n "$GITHUB_TOKEN" ]; then
-      COMMENT_JSON=$(jq -n --arg body "$TEST_OUTPUT" '{body: $body}')
-      curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" \
-        -d "$COMMENT_JSON" "https://api.github.com/repos/${REPO_NAME}/issues/${PR_NUMBER}/comments"
-    fi
   fi
 elif [ "$COMMAND" = "delete" ]; then
   if [ -z "$GITHUB_TOKEN" ]; then
