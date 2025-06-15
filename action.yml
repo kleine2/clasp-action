@@ -51,6 +51,8 @@ outputs:
     description: 'URL of the created script when using the create or create_and_push command'
   spreadsheet_url:
     description: 'URL of the newly created spreadsheet document when using the create or create_and_push command'
+  test_output:
+    description: 'Result from the test function executed during create_and_push'
 runs:
   using: 'docker'
   image: 'Dockerfile'

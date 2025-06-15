@@ -75,6 +75,10 @@ URL of the created script when `command` is `create` or `create_and_push`.
 
 URL of the newly created spreadsheet document when `command` is `create` or `create_and_push`.
 
+### `test_output`
+
+Result from the test function executed during `create_and_push`.
+
 ## Example usage
 
 ### Case to push

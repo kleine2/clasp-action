@@ -213,6 +213,7 @@ EOF
     clasp run-function setupTestContext --params "[\"${SPREADSHEET_ID}\",\"Sheet1\"]"
     TEST_OUTPUT=$(clasp run-function "$TEST_FUNC" 2>&1)
     echo "$TEST_OUTPUT"
+    printf 'test_output<<EOF\n%s\nEOF\n' "$TEST_OUTPUT" >> "$GITHUB_OUTPUT"
     PR_NUMBER=$(jq -r '.pull_request.number // empty' "$GITHUB_EVENT_PATH")
     REPO_NAME=$(jq -r '.repository.full_name' "$GITHUB_EVENT_PATH")
     if [ -n "$PR_NUMBER" ] && [ -n "$GITHUB_TOKEN" ]; then
