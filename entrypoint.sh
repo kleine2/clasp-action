@@ -103,15 +103,20 @@ elif [ "$COMMAND" = "create_and_push" ]; then
   fi
 
   if [ -n "$8" ]; then
-    MANIFEST_PATH="$8/appsscript.json"
-    if [ -f "$MANIFEST_PATH" ]; then
-      cp "$MANIFEST_PATH" "$MANIFEST_PATH.bak"
+    if [ -d "$8" ]; then
+      MANIFEST_PATH="$8/appsscript.json"
+      if [ -f "$MANIFEST_PATH" ]; then
+        cp "$MANIFEST_PATH" "$MANIFEST_PATH.bak"
+      fi
+      cd "$8"
+      CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" 2>&1)
+      if [ -f appsscript.json.bak ]; then
+        mv appsscript.json.bak appsscript.json
+      fi
+    else
+      echo "rootDir is invalid."
+      exit 1
     fi
-    CREATE_OUT=$(clasp create-script --type sheets --title "$TITLE" --rootDir "$8" 2>&1)
-    if [ -f "$MANIFEST_PATH.bak" ]; then
-      mv "$MANIFEST_PATH.bak" "$MANIFEST_PATH"
-    fi
-    cd "$8"
   else
     if [ -f appsscript.json ]; then
       cp appsscript.json appsscript.json.bak
